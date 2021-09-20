@@ -11,7 +11,7 @@ import java.util.List;
 public class SearchInfo {
 
 	private List<State> solutionPath;
-	private int cost, numNodesCreated;
+	private int cost;
 	private double time;
 	private boolean cutoff;
 
@@ -22,9 +22,8 @@ public class SearchInfo {
 	 * Instantiates a new search info. 
 	 * Created to build a searchInfo that indicates cutoff.
 	 */
-	public SearchInfo(boolean cutoff, int numNodeCreated) {
+	public SearchInfo(boolean cutoff) {
 		this.cutoff = cutoff;
-		this.numNodesCreated = numNodeCreated;
 	}
 
 	/**
@@ -34,10 +33,9 @@ public class SearchInfo {
 	 * @param numNodeCreated the total number of nodes created
 	 * @param time the run time of the algorithm
 	 */
-	public SearchInfo(List<State> solutionPath, int cost, int numNodeCreated, double time) {
+	public SearchInfo(List<State> solutionPath, int cost, double time) {
 		this.solutionPath = solutionPath;
 		this.time = time;
-		this.numNodesCreated = numNodeCreated;
 		this.cost = cost;
 		this.cutoff = false;
 	}
@@ -55,15 +53,6 @@ public class SearchInfo {
 	 * Sets the cost */
 	public void setCost(int cost) {
 		this.cost = cost;
-	}
-
-	/**@return the number of nodes created */
-	public int getNumNodesCreated() {
-		return numNodesCreated;
-	}
-	/** Sets the num nodes created */
-	public void setNumNodesCreated(int numNodeCreated) {
-		this.numNodesCreated = numNodeCreated;
 	}
 
 	/**

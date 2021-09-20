@@ -1,7 +1,5 @@
 import java.awt.Point;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * This class represents a state of the Colored Tile Puzzle game. 
@@ -11,12 +9,12 @@ import java.util.List;
  */
 public class PuzzleState implements State {
 
-	private static int redCost = 30, greenCost = 1, discovery = 0;
+	static int redCost = 30, greenCost = 1, discovery = 0;
 	private Tile[][] board;
 	/** the (x,y) of the empty location on the board. */
 	private Point empty;
 	private State parent;
-	private int cost, discoveryTime; 
+	private int cost, lastOperator, discoveryTime; 
 	/** Remark if this state is out of the open list. */ 
 	private boolean out; 
 
@@ -49,44 +47,38 @@ public class PuzzleState implements State {
 	 * @param parent the parent of this state
 	 * @param cost the cost from initial state to current state
 	 */
-	public PuzzleState(Tile[][] board, Point empty, State parent, int cost) {
+	public PuzzleState(Tile[][] board, Point empty, State parent, int cost, int lastOperator) {
 		this.board = board;
 		this.empty = empty;
 		this.parent = parent;
 		this.cost = cost;
 		this.discoveryTime = discovery++;
 		this.out = false;
+		this.lastOperator = lastOperator;
 	}
 
 	/**
-	 * Gets all allowed operators from this state.
-	 * Will never get back to parent state.
-	 * @return a list of all allowed operators
+	 * Activates an operator on the current state.
+	 * @param operator the number of the operator to activate
+	 * @return the received state or null if this operator cannot be enabled.
 	 */
 	@Override
-	public List<State> operators() {
-		List<State> statesList = new LinkedList<State>();
-		Point newEmpty;
-		int lastOperator = getLastOperator();
-		// check all possible operators
-		for(int operator=1; operator<5; operator++) {
-			newEmpty = new Point(empty);
-			// Build the new empty location according to every possible operator
-			if(operator==1 && lastOperator!=3 && empty.y<board[0].length-1)   newEmpty.y++;  // Left
-			else if(operator==2 && lastOperator!=4 && empty.x<board.length-1) newEmpty.x++;  // Up
-			else if(operator==3 && lastOperator!=1 && empty.y>0)		 	  newEmpty.y--;  // Right
-			else if(operator==4 && lastOperator!=2 && empty.x>0)              newEmpty.x--;  // Down
-			else continue;
-			// If the tile to move is black do nothing
-			if(board[newEmpty.x][newEmpty.y].getColor() == 'b') continue;
-			// Calculate the cost of moving the tile from the new empty location
-			int newCost = 0;
-			if(board[newEmpty.x][newEmpty.y].getColor() == 'r') newCost = cost + redCost;
-			else newCost = cost + greenCost;
-			// Build the new state and enter it to the states list
-			statesList.add(new PuzzleState(moveTile(newEmpty), newEmpty, this, newCost));
-		}
-		return statesList;
+	public State getOperator(int operator) {
+		Point newEmpty = new Point(empty);
+		// Build the new empty location
+		if(operator==1 && lastOperator!=3 && empty.y<board[0].length-1)   newEmpty.y++;  // Left
+		else if(operator==2 && lastOperator!=4 && empty.x<board.length-1) newEmpty.x++;  // Up
+		else if(operator==3 && lastOperator!=1 && empty.y>0)		 	  newEmpty.y--;  // Right
+		else if(operator==4 && lastOperator!=2 && empty.x>0)              newEmpty.x--;  // Down
+		else return null;
+		// If the tile to move is black return null
+		if(board[newEmpty.x][newEmpty.y].getColor() == 'b') return null;
+		// Calculate the cost of moving the tile from the new empty location
+		int newCost = 0;
+		if(board[newEmpty.x][newEmpty.y].getColor() == 'r') newCost = cost + redCost;
+		else newCost = cost + greenCost;
+		// return the new state
+		return new PuzzleState(moveTile(newEmpty), newEmpty, this, newCost, operator);
 	}
 
 	// A private method designed to create a new board with sliding tile to the new empty location
@@ -164,6 +156,12 @@ public class PuzzleState implements State {
 	public int getDiscoveryTime() {
 		return discoveryTime;
 	}
+	
+	/** @return the number of total operators of this state */
+	@Override
+	public int getNumOperators() {
+		return 4;
+	}
 
 	/**
 	 * Checks if this state is out of the open list.
@@ -186,12 +184,7 @@ public class PuzzleState implements State {
 
 	/** @return the lastOperator that leads to this state */
 	public int getLastOperator() {
-		if(parent == null) return 0;
-		PuzzleState puzzleState = (PuzzleState)parent;
-		if(empty.y == puzzleState.empty.y+1) return 1;
-		else if(empty.x == puzzleState.empty.x+1) return 2;
-		else if(empty.y == puzzleState.empty.y-1) return 3;
-		else return 4;
+		return lastOperator;
 	}
 
 	/** @return The last tile number moved to reach the current state */
@@ -235,13 +228,13 @@ public class PuzzleState implements State {
 	public int maxThreshold() {
 		return Math.min(factorial(board.length*board[0].length-1), Integer.MAX_VALUE);
 	}
-	
+
 	public int factorial(int n) {
 		if(n>12) return Integer.MAX_VALUE;
-	    int fact = 1;
-	    for (int i = 2; i <= n; i++) {
-	        fact = fact * i;
-	    }
-	    return fact;
+		int fact = 1;
+		for (int i = 2; i <= n; i++) {
+			fact = fact * i;
+		}
+		return fact;
 	}
 }

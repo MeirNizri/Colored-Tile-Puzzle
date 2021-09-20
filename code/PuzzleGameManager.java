@@ -32,13 +32,17 @@ public class PuzzleGameManager {
 
 	/** Start game */
 	public void startGame() {
+		SearchAlgorithms searchAlgo = null;
+		// Build the object that represents the search algorithm
 		switch(searchAlgorithm) {
-		case("BFS")   : searchInfo = SearchAlgorithms.BFS(initialState, withOpen); break;
-		case("DFID")  : searchInfo = SearchAlgorithms.DFID(initialState, withOpen); break;
-		case("A*")    : searchInfo = SearchAlgorithms.A_star(initialState, withOpen); break;
-		case("IDA*")  : searchInfo = SearchAlgorithms.IDA_star(initialState, withOpen); break;
-		case("DFBnB") : searchInfo = SearchAlgorithms.DFBnB(initialState, withOpen); break;
+		case("BFS")   : searchAlgo = new BFS(); break;
+		case("DFID")  : searchAlgo = new DFID(); break;
+		case("A*")    : searchAlgo = new A_star(); break;
+		case("IDA*")  : searchAlgo = new IDA_star(); break;
+		case("DFBnB") : searchAlgo = new DFBnB(); break;
 		}
+		// Executes the search algorithm and insert all the search information to searchInfo
+		searchInfo = searchAlgo.execute(initialState, withOpen);
 		// find moves 
 		moves = findMoves();
 	}
@@ -78,7 +82,7 @@ public class PuzzleGameManager {
 
 	/** @return the total number of nodes created */
 	public int getNumNodeCreated() {
-		return searchInfo.getNumNodesCreated();
+		return PuzzleState.discovery;
 	}
 
 	/** @return the algorithm run time */

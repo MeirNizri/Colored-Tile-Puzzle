@@ -1,5 +1,3 @@
-import java.util.List;
-
 /**
  * The Interface State represent a state of any problem. The search algorithms 
  * gets states from classes that implement this interface only. The methods defined 
@@ -9,9 +7,11 @@ import java.util.List;
 public interface State {
 
 	/**
-	 * @return a list of all allowed operators from this state
+	 * Activates an operator on the current state.
+	 * @param operator the number of the operator to activate
+	 * @return the received state or null if this operator cannot be enabled.
 	 */
-	public List<State> operators();
+	public State getOperator(int operator);
 
 	/**
 	 * @return true if this state is goal, false otherwise
@@ -40,6 +40,11 @@ public interface State {
 	 */
 	public int getDiscoveryTime();
 
+	/**
+	 * @return the number of total operators of this state
+	 */
+	public int getNumOperators();
+	
 	/**
 	 * Checks if this state is out of the open list.
 	 * The main use is in the DFBnB algorithm.

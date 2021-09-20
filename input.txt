@@ -1,9 +1,0 @@
-DFID
-with time
-no open
-3x3
-Black:
-Red:
-_,7,2
-1,5,3
-4,8,6
